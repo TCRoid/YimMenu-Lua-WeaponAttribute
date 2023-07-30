@@ -74,7 +74,9 @@ local function set_weapon_info_data(CWeaponInfo, data)
     for key, item in pairs(weapon_attr_list) do
         local name = item.name
         if name ~= "weapon_hash" and data[name] ~= nil then
-            CWeaponInfo:add(item.offset):set_float(data[name])
+            if item.type == "float" then
+                CWeaponInfo:add(item.offset):set_float(data[name])
+            end
         end
     end
 end
@@ -87,7 +89,9 @@ local function generate_attr_inputs(tab_parent)
     local attr_inputs = {}
     for key, item in pairs(weapon_attr_list) do
         if item.name ~= "weapon_hash" then
-            attr_inputs[item.name] = tab_parent:add_input_float(item.text)
+            if item.type == "float" then
+                attr_inputs[item.name] = tab_parent:add_input_float(item.text)
+            end
         end
     end
     return attr_inputs
@@ -175,6 +179,52 @@ tab_root:add_button("载具机枪 快速射击", function()
         set_weapon_info_data(CWeaponInfo, data)
         gui.show_message("武器: " .. data["weapon_hash"], "属性已修改")
     end
+end)
+
+
+tab_root:add_separator()
+tab_root:add_text("特定预设")
+
+local lazer_weapon_info = 0
+-- 3800181289 VEHICLE_WEAPON_PLAYER_LAZER
+tab_root:add_button("天煞九头蛇 原版机炮", function()
+    if lazer_weapon_info == 0 or lazer_weapon_info:is_null() then
+        local CWeaponInfo = get_ped_weapon_info(PLAYER.PLAYER_PED_ID())
+        if CWeaponInfo ~= 0 then
+            local weapon_hash = get_weapon_hash(CWeaponInfo)
+            if weapon_hash == 3800181289 then
+                lazer_weapon_info = CWeaponInfo
+            else
+                gui.show_message("天煞九头蛇 机炮属性修改", "要坐进飞机并将武器切换到机炮")
+                return
+            end
+        end
+    end
+
+    lazer_weapon_info:add(0x24):set_float(0)
+    lazer_weapon_info:add(0x13c):set_float(0.03999999911)
+    lazer_weapon_info:add(0x150):set_float(-1)
+    gui.show_message("天煞九头蛇 机炮属性修改", "机炮属性已修改为原版")
+end)
+tab_root:add_sameline()
+tab_root:add_button("天煞九头蛇 削弱机炮", function()
+    if lazer_weapon_info == 0 or lazer_weapon_info:is_null() then
+        local CWeaponInfo = get_ped_weapon_info(PLAYER.PLAYER_PED_ID())
+        if CWeaponInfo ~= 0 then
+            local weapon_hash = get_weapon_hash(CWeaponInfo)
+            if weapon_hash == 3800181289 then
+                lazer_weapon_info = CWeaponInfo
+            else
+                gui.show_message("天煞九头蛇 机炮属性修改", "要坐进飞机并将武器切换到机炮")
+                return
+            end
+        end
+    end
+
+    lazer_weapon_info:add(0x24):set_float(85)
+    lazer_weapon_info:add(0x13c):set_float(0.125)
+    lazer_weapon_info:add(0x150):set_float(0.125)
+    gui.show_message("天煞九头蛇 机炮属性修改", "机炮属性已修改为削弱")
 end)
 
 
